@@ -1,3 +1,5 @@
+package basic;
+
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -25,6 +27,9 @@ public class Game {
 
 		////////////////////////////////////////////
 
+    horizontalMoves = new ArrayList<>();
+    verticalMoves = new ArrayList<>();
+    
 		// initialize horizontal player's moves
 		for (int i = 0; i < width - 2; i++) {
 			for (int j = 0; j < height; j++) {
@@ -217,47 +222,44 @@ public class Game {
 	}
 
 	public void makeMove(Point[] input) {
-		// go through horizontal moves first and remove any move that is invalid
+		ArrayList<Point[]> toBeRemoved = new ArrayList<>();
+
+    // go through horizontal moves first and remove any move that is invalid
 		// because of the move that has been made
-		for (Point[] move : horizontalMoves) {
-			Point point1 = input[1];
-			Point point2 = input[2];
-			Point point3 = input[3];
+		for (int i=0; i<horizontalMoves.size(); i++) {
+			Point[] move = horizontalMoves.get(i);
+      
+      Point point1 = input[0];
+			Point point2 = input[1];
+			Point point3 = input[2];
 			// check if any of the coordinates of the move that we're checking
 			// matches with the move that was made
-			for (int i = 0; i < move.length; i++) {
-				if (move[i] == point1) {
-					horizontalMoves.remove(move);
-				} else if (move[i] == point2) {
-					horizontalMoves.remove(move);
-				} else if (move[i] == point3) {
-					horizontalMoves.remove(move);
+			for (int j = 0; j < move.length; j++) {
+				if (move[j] == point1 || move[j] == point2 || move[j] == point3) {
+					toBeRemoved.add(move);
 				}
 			}
-
 		}
+    horizontalMoves.removeAll(toBeRemoved);
+    toBeRemoved.clear();
+    
 		// go through vertical moves and remove any move that is invalid because
 		// of the mvoe that has been made
 		for (Point[] move : verticalMoves) {
-			Point point1 = input[1];
-			Point point2 = input[2];
-			Point point3 = input[3];
+			Point point1 = input[0];
+			Point point2 = input[1];
+			Point point3 = input[2];
 			// check if any of the coordinates of the move that we're checking
 			// matches with the move that was made
-			for (int i = 0; i < move.length; i++) {
-				if (move[i] == point1) {
-					horizontalMoves.remove(move);
-				} else if (move[i] == point2) {
-					horizontalMoves.remove(move);
-				} else if (move[i] == point3) {
-					horizontalMoves.remove(move);
+			for (int j = 0; j < move.length; j++) {
+				if (move[j] == point1 || move[j] == point2 || move[j] == point3) {
+					toBeRemoved.add(move);
 				}
 			}
-
 		}
-
+    horizontalMoves.removeAll(toBeRemoved);
 	}
-
+  
 	private Game copy() {
 		Game game = new Game(true);
 		game.horizontalMoves = this.horizontalMoves;
