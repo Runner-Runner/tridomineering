@@ -10,6 +10,7 @@ public class GameState
   private int width;
   private int height;
   private List<Piece> moveHistory;
+
   private boolean verticalsTurn = true;
 
   public static final boolean FREE = false;
@@ -82,7 +83,7 @@ public class GameState
           if (localTiles[i + offset][j])
           {
             //Skip behind the occupied tile
-            i += offset + 1;
+            i += offset;
             continue widthloop;
           }
         }
@@ -99,9 +100,9 @@ public class GameState
       for (Piece availableMove : availableMoves)
       {
         Piece piece = new Piece(
-                new Point(availableMove.p1.y, availableMove.p1.x),
-                new Point(availableMove.p2.y, availableMove.p2.x),
-                new Point(availableMove.p3.y, availableMove.p3.x));
+                new Point(availableMove.p1.y, height - 1 - availableMove.p1.x),
+                new Point(availableMove.p2.y, height - 1 - availableMove.p2.x),
+                new Point(availableMove.p3.y, height - 1 - availableMove.p3.x));
         realAvailableMoves.add(piece);
       }
       availableMoves = realAvailableMoves;
@@ -129,7 +130,9 @@ public class GameState
         safeMovesAmount++;
       }
     }
-    return safeMovesAmount;
+//    return safeMovesAmount;
+//TODO Do these work correctly?
+    return 0;
   }
 
   public int getHeuristicValue()
@@ -137,11 +140,37 @@ public class GameState
     int ownMoveAmount = getAvailableMoves(verticalsTurn).size();
     int opponentMoveAmount = getAvailableMoves(!verticalsTurn).size();
     int moveDiff = ownMoveAmount - opponentMoveAmount;
+    
+//    System.out.println("Score: " + (moveDiff + getSafeMovesAmount()) + ", own: " + 
+//            ownMoveAmount + ", opp  " + 
+//            opponentMoveAmount + ", safediff: " + 
+//            getSafeMovesAmount() + ", move: " + moveHistory.get(moveHistory.size()-1));
+    
     return moveDiff + getSafeMovesAmount();
   }
 
   public void toggleVerticalsTurn()
   {
     verticalsTurn = !verticalsTurn;
+  }
+  
+  public List<Piece> getMoveHistory()
+  {
+    return moveHistory;
+  }
+  
+  public boolean[][] getBoard()
+  {
+    return board;
+  }
+
+  public int getWidth()
+  {
+    return width;
+  }
+
+  public int getHeight()
+  {
+    return height;
   }
 }

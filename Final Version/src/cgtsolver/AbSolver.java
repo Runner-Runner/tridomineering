@@ -20,17 +20,16 @@ public class AbSolver
     nodeCounter = 0;
 
     int score = alphaBetaSearch(currentGameState, Integer.MIN_VALUE, 
-            Integer.MAX_VALUE, true);
+            Integer.MAX_VALUE, 49);
 
     lastCalcDuration = System.currentTimeMillis() - currentTime;
     double secDuration = ((double) lastCalcDuration) / 1000;
 
-    System.out.println("Search Duration: " + secDuration
-            + " seconds. Nodes searched: " + nodeCounter);
+    System.out.println("Score: " + score + ", Search Duration: " + secDuration
+            + " seconds. Nodes searched: " + nodeCounter + ", Moves: " + currentGameState.getMoveHistory().size());
   }
-//TODO remove flag
-  private int alphaBetaSearch(GameState gameState, int alpha, int beta, 
-          boolean startFlag)
+
+  private int alphaBetaSearch(GameState gameState, int alpha, int beta, int depth)
   {
     //TODO Use cgs for small enough boards
     
@@ -61,13 +60,28 @@ public class AbSolver
     gameState.doMove(bestMove);
     gameState.toggleVerticalsTurn();
     
-    System.out.println("Move: " + bestMove);
+    ///
+//    System.out.println("Move: " + bestMove);
+    boolean[][] board = gameState.getBoard();
     
-    int value = -alphaBetaSearch(gameState, -beta, -alpha, false);
+    System.out.println("");
+    for(int i=0; i<gameState.getHeight(); i++)
+    {
+      for(int j=0; j<gameState.getWidth(); j++)
+      {
+        String a = board[j][i] ? "x" : " ";
+        System.out.print("|" + a + "|");
+      }
+      System.out.println("");
+    }
+    ///
+    
+    if(depth == 0)
+    {
+      return gameState.getHeuristicValue();
+    }
+    int value = -alphaBetaSearch(gameState, -beta, -alpha, --depth);
       
-    gameState.undoMove();
-    gameState.toggleVerticalsTurn();
-    
     if (value > score)
     {
       score = value;
