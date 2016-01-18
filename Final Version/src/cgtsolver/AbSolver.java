@@ -19,14 +19,61 @@ public class AbSolver
 
     nodeCounter = 0;
 
-    int score = alphaBetaSearch(currentGameState, Integer.MIN_VALUE, 
-            Integer.MAX_VALUE, 49);
-
+    GameState gameStateVerticalStarts = new GameState(
+            currentGameState.getWidth(), 
+            currentGameState.getHeight());
+    GameState gameStateHorizontalStarts = new GameState(
+            currentGameState.getWidth(), 
+            currentGameState.getHeight());
+    gameStateHorizontalStarts.toggleVerticalsTurn();
+    boolean[][] vboard = gameStateVerticalStarts.getBoard();
+    boolean[][] hboard = gameStateHorizontalStarts.getBoard();
+    boolean[][] board = currentGameState.getBoard();
+    for(int i=0; i<currentGameState.getWidth(); i++)
+    {
+      for(int j=0; j<currentGameState.getHeight(); j++)
+      {
+        vboard[i][j] = hboard[i][j] = board[i][j];
+      }
+    }
+    
+    
+    int scoreVerticalStarts = alphaBetaSearch(gameStateVerticalStarts, 
+            Integer.MIN_VALUE, Integer.MAX_VALUE, 49);
+    int scoreHorizontalStarts = alphaBetaSearch(gameStateHorizontalStarts, 
+            Integer.MIN_VALUE, Integer.MAX_VALUE, 49);
+    String result;
+    if(scoreVerticalStarts == scoreHorizontalStarts)
+    {
+      if(scoreVerticalStarts == POS_INF)
+      {
+        result = "First player win.";
+      }
+      else
+      {
+        result = result = "Second player win.";
+      }
+    }
+    else
+    {
+      if(scoreVerticalStarts == POS_INF)
+      {
+        result = "Vertical player win.";
+      }
+      else
+      {
+        result = "Horizontal player win.";
+      }
+    }
+    
     lastCalcDuration = System.currentTimeMillis() - currentTime;
     double secDuration = ((double) lastCalcDuration) / 1000;
 
-    System.out.println("Score: " + score + ", Search Duration: " + secDuration
+    System.out.println("Result: " + result);
+    
+    System.out.println("Search Duration: " + secDuration
             + " seconds. Nodes searched: " + nodeCounter + ", Moves: " + currentGameState.getMoveHistory().size());
+    
   }
 
   private int alphaBetaSearch(GameState gameState, int alpha, int beta, int depth)
