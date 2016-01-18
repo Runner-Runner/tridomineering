@@ -109,30 +109,110 @@ public class GameState
     }
     return availableMoves;
   }
-
-  public int getSafeMovesAmount()
+  
+  public int getRealMovesNumber(boolean verticalsTurn)
   {
-    int safeMovesAmount = 0;
-    List<Piece> ownMoves = getAvailableMoves(verticalsTurn);
-    List<Piece> opponentsMoves = getAvailableMoves(!verticalsTurn);
-    for (Piece piece : ownMoves)
+    int realMovesNumber = 0;
+    
+    boolean[][] localTiles = board;
+
+    if (verticalsTurn)
     {
-      boolean overlapFound = false;
-      for (Piece opponentsPiece : opponentsMoves)
+      //Just temporarely rotate the game for vertical player (turn 90° cw)
+      localTiles = new boolean[height][width];
+
+      for (int i = 0; i < width; i++)
       {
-        if (piece.overlap(opponentsPiece))
+        for (int j = 0; j < height; j++)
         {
-          overlapFound = true;
+          localTiles[height - 1 - j][i] = board[i][j];
         }
       }
-      if (!overlapFound)
+    }
+    
+    for (int j = 0; j < localTiles[0].length; j++)
+    {
+      widthloop:
+      for (int i = 0; i < localTiles.length; i++)
       {
-        safeMovesAmount++;
+        if (i + 2 >= localTiles.length)
+        {
+          continue;
+        }
+      
+        for (int offset = 2; offset >= 0; offset--)
+        {
+          if (localTiles[i + offset][j])
+          {
+            //Skip behind the occupied tile
+            i += offset;
+            continue widthloop;
+          }
+        }
+        realMovesNumber++;
+        i += 2;
       }
     }
-//    return safeMovesAmount;
-//TODO Do these work correctly?
-    return 0;
+    return realMovesNumber;
+  }
+
+  public int getSafeMovesNumber(boolean verticalsTurn)
+  {
+    int safeMovesNumber = 0;
+    
+    boolean[][] localTiles = new boolean[width][height];
+    //Create deep copy
+    for(int i=0; i<width; i++)
+    {
+      System.arraycopy(board[i], 0, localTiles[i], 0, height);
+    }
+
+    List<Piece> opponentsMoves = getAvailableMoves(!verticalsTurn);
+    for(Piece piece : opponentsMoves)
+    {
+      localTiles[piece.p1.x][piece.p1.y] = OCCUPIED;
+      localTiles[piece.p2.x][piece.p2.y] = OCCUPIED;
+      localTiles[piece.p3.x][piece.p3.y] = OCCUPIED;
+    }
+    
+    if (verticalsTurn)
+    {
+      //Just temporarely rotate the game for vertical player (turn 90° cw)
+      localTiles = new boolean[height][width];
+
+      for (int i = 0; i < width; i++)
+      {
+        for (int j = 0; j < height; j++)
+        {
+          localTiles[height - 1 - j][i] = board[i][j];
+        }
+      }
+    }
+    
+    for (int j = 0; j < localTiles[0].length; j++)
+    {
+      widthloop:
+      for (int i = 0; i < localTiles.length; i++)
+      {
+        if (i + 2 >= localTiles.length)
+        {
+          continue;
+        }
+      
+        for (int offset = 2; offset >= 0; offset--)
+        {
+          if (localTiles[i + offset][j])
+          {
+            //Skip behind the occupied tile
+            i += offset;
+            continue widthloop;
+          }
+        }
+        safeMovesNumber++;
+        i += 2;
+      }
+    }
+    return safeMovesNumber;
   }
 
   public int getHeuristicValue()
@@ -146,7 +226,7 @@ public class GameState
 //            opponentMoveAmount + ", safediff: " + 
 //            getSafeMovesAmount() + ", move: " + moveHistory.get(moveHistory.size()-1));
     
-    return moveDiff + getSafeMovesAmount();
+    return moveDiff + getSafeMovesNumber(verticalsTurn);
   }
 
   public void toggleVerticalsTurn()
