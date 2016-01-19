@@ -1,12 +1,15 @@
 package cgtsolver;
 
+import java.util.List;
+
 public class GameMain
 {
   public static void main(String args[])
   {
     AbSolver abSolver = new AbSolver();
-    abSolver.search(new GameState(5,5));
-
+    GameState gameState = new GameState(7,7);
+    abSolver.search(gameState);
+    
 //    GameState gameState = new GameState(5, 5);
 //    boolean[][] board = gameState.getBoard();
 //    board[2][0] = true;

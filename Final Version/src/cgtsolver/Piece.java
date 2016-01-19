@@ -8,6 +8,8 @@ public class Piece
   public Point p2;
   public Point p3;
 
+  private int moveOrderingValue;
+  
   public Piece(Point p1, Point p2, Point p3)
   {
     this.p1 = p1;
@@ -22,6 +24,16 @@ public class Piece
             this.p1.equals(piece.p1);
   }
 
+  public int getMoveOrderingValue()
+  {
+    return moveOrderingValue;
+  }
+  
+  public void setMoveOrderingValue(int moveOrderingValue)
+  {
+    this.moveOrderingValue = moveOrderingValue;
+  }
+  
   @Override
   public String toString()
   {

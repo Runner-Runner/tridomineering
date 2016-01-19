@@ -178,15 +178,16 @@ public class GameState
     if (verticalsTurn)
     {
       //Just temporarely rotate the game for vertical player (turn 90° cw)
-      localTiles = new boolean[height][width];
+      boolean[][] rotatedLocalTiles = new boolean[height][width];
 
       for (int i = 0; i < width; i++)
       {
         for (int j = 0; j < height; j++)
         {
-          localTiles[height - 1 - j][i] = board[i][j];
+          rotatedLocalTiles[height - 1 - j][i] = localTiles[i][j];
         }
       }
+      localTiles = rotatedLocalTiles;
     }
     
     for (int j = 0; j < localTiles[0].length; j++)
@@ -252,5 +253,10 @@ public class GameState
   public int getHeight()
   {
     return height;
+  }
+  
+  public boolean getVerticalsTurn()
+  {
+    return verticalsTurn;
   }
 }
