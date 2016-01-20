@@ -4,13 +4,28 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a game state on a Triomineering board. Stores the size, occupied
+ * tiles, player to move and the move history so far. Enables making and undoing
+ * moves, as well as getting the number of remaining real and safe moves for
+ * either player.
+ *
+ * @author daniel
+ */
 public class GameState
 {
   private boolean[][] board;
   private int width;
   private int height;
+
+  /**
+   * List of the moves made so far by both players.
+   */
   private List<Piece> moveHistory;
 
+  /**
+   * Stores which player is to move.
+   */
   private boolean verticalsTurn = true;
 
   public static final boolean FREE = false;
@@ -24,6 +39,12 @@ public class GameState
     moveHistory = new ArrayList<>();
   }
 
+  /**
+   * Occupies the tiles of the set piece on the board and stores the move in
+   * history.
+   *
+   * @param piece
+   */
   public void doMove(Piece piece)
   {
     board[piece.p1.x][piece.p1.y] = OCCUPIED;
@@ -33,6 +54,9 @@ public class GameState
     moveHistory.add(piece);
   }
 
+  /**
+   * Undo the last move that was made on the board.
+   */
   public void undoMove()
   {
     Piece piece = moveHistory.remove(moveHistory.size() - 1);
@@ -41,15 +65,24 @@ public class GameState
     board[piece.p3.x][piece.p3.y] = FREE;
   }
 
+  /**
+   * Gets the available moves for the player to move. Convenience method.
+   *
+   * @return
+   */
   public List<Piece> getAvailableMoves()
   {
     return getAvailableMoves(verticalsTurn);
   }
-  
+
+  /**
+   * Gets the available moves for a certain player.
+   *
+   * @param verticalsTurn
+   * @return
+   */
   public List<Piece> getAvailableMoves(boolean verticalsTurn)
   {
-    //TODO For efficiency, cache value as member until game state changes
-
     List<Piece> availableMoves = new ArrayList<>();
 
     boolean[][] localTiles = board;
@@ -77,7 +110,7 @@ public class GameState
         {
           continue;
         }
-      
+
         for (int offset = 2; offset >= 0; offset--)
         {
           if (localTiles[i + offset][j])
@@ -109,11 +142,18 @@ public class GameState
     }
     return availableMoves;
   }
-  
+
+  /**
+   * Returns the number of real moves: the maximum number of moves a player can
+   * make if the other would not move at all. This defines an upper boundary.
+   *
+   * @param verticalsTurn
+   * @return
+   */
   public int getRealMovesNumber(boolean verticalsTurn)
   {
     int realMovesNumber = 0;
-    
+
     boolean[][] localTiles = board;
 
     if (verticalsTurn)
@@ -129,7 +169,7 @@ public class GameState
         }
       }
     }
-    
+
     for (int j = 0; j < localTiles[0].length; j++)
     {
       widthloop:
@@ -139,7 +179,7 @@ public class GameState
         {
           continue;
         }
-      
+
         for (int offset = 2; offset >= 0; offset--)
         {
           if (localTiles[i + offset][j])
@@ -156,24 +196,35 @@ public class GameState
     return realMovesNumber;
   }
 
+  /**
+   * Returns the number of safe moves: the number of moves a player can make if
+   * that can not be prevented by any move of the opponent. This defines an
+   * lower boundary.
+   *
+   * @param verticalsTurn
+   * @return
+   */
   public int getSafeMovesNumber(boolean verticalsTurn)
   {
     int safeMovesNumber = 0;
-    
+
     boolean[][] localTiles = new boolean[width][height];
     //Create deep copy
-    for(int i=0; i<width; i++)
+    for (int i = 0; i < width; i++)
     {
       System.arraycopy(board[i], 0, localTiles[i], 0, height);
     }
 
+    //Occupy all tiles where the opponent could move.
     List<Piece> opponentsMoves = getAvailableMoves(!verticalsTurn);
-    for(Piece piece : opponentsMoves)
+    for (Piece piece : opponentsMoves)
     {
       localTiles[piece.p1.x][piece.p1.y] = OCCUPIED;
       localTiles[piece.p2.x][piece.p2.y] = OCCUPIED;
       localTiles[piece.p3.x][piece.p3.y] = OCCUPIED;
     }
+
+    //Then, just get the maximum numbers of moves possible for this player
     
     if (verticalsTurn)
     {
@@ -189,7 +240,7 @@ public class GameState
       }
       localTiles = rotatedLocalTiles;
     }
-    
+
     for (int j = 0; j < localTiles[0].length; j++)
     {
       widthloop:
@@ -199,7 +250,7 @@ public class GameState
         {
           continue;
         }
-      
+
         for (int offset = 2; offset >= 0; offset--)
         {
           if (localTiles[i + offset][j])
@@ -216,30 +267,19 @@ public class GameState
     return safeMovesNumber;
   }
 
-  public int getHeuristicValue()
-  {
-    int ownMoveAmount = getAvailableMoves(verticalsTurn).size();
-    int opponentMoveAmount = getAvailableMoves(!verticalsTurn).size();
-    int moveDiff = ownMoveAmount - opponentMoveAmount;
-    
-//    System.out.println("Score: " + (moveDiff + getSafeMovesAmount()) + ", own: " + 
-//            ownMoveAmount + ", opp  " + 
-//            opponentMoveAmount + ", safediff: " + 
-//            getSafeMovesAmount() + ", move: " + moveHistory.get(moveHistory.size()-1));
-    
-    return moveDiff + getSafeMovesNumber(verticalsTurn);
-  }
-
+  /**
+   * Switches the player to move.
+   */
   public void toggleVerticalsTurn()
   {
     verticalsTurn = !verticalsTurn;
   }
-  
+
   public List<Piece> getMoveHistory()
   {
     return moveHistory;
   }
-  
+
   public boolean[][] getBoard()
   {
     return board;
@@ -254,7 +294,7 @@ public class GameState
   {
     return height;
   }
-  
+
   public boolean getVerticalsTurn()
   {
     return verticalsTurn;
