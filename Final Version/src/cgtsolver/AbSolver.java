@@ -8,7 +8,6 @@ public class AbSolver
 {
   protected int nodeCounter = 0;
   protected long lastCalcDuration;
-  protected Piece optimalMove;
   protected ZobristTranspositionTable zorbist;
   
   public static final int POS_INF = 1000000;
@@ -20,8 +19,6 @@ public class AbSolver
             currentGameState.getHeight());
     
     long currentTime = System.currentTimeMillis();
-
-    optimalMove = null;
 
     nodeCounter = 0;
 
@@ -103,6 +100,16 @@ public class AbSolver
     int safeOwn = gameState.getSafeMovesNumber(gameState.getVerticalsTurn());
     int safeOpp = gameState.getSafeMovesNumber(!gameState.getVerticalsTurn());
 
+    //Abort criterion
+    if(safeOwn > realOpp)
+    {
+      return POS_INF;
+    }
+    else if(realOwn < safeOpp)
+    {
+      return NEG_INF;
+    }
+    
     for (Piece move : availableMoves)
     {
       gameState.doMove(move);
@@ -125,7 +132,7 @@ public class AbSolver
       @Override
       public int compare(Piece o1, Piece o2)
       {
-        return o2.getMoveOrderingValue() - o1.getMoveOrderingValue();
+        return o1.getMoveOrderingValue() - o2.getMoveOrderingValue();
       }
     });
 
@@ -153,7 +160,6 @@ public class AbSolver
       }
       if (alpha >= beta)
       {
-        //TODO Pruning still applicable?
         break;
       }
     }

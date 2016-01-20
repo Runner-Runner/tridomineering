@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 public class ZobristTranspositionTable
 {
-  private int piece;
   private long[] table;
   private int height;
   private int width;
@@ -16,7 +15,6 @@ public class ZobristTranspositionTable
   {
     transpositionMap = new HashMap<>();
     
-    piece = 1;
     height = tHeight;
     width = tWidth;
     table = new long[height * width];
@@ -69,30 +67,12 @@ public class ZobristTranspositionTable
     }
     return h;
   }
-
-  private int[] twoToOne(boolean[][] board)
-  {
-    int counter = 0;
-    int[] boardList = new int[64];
-    for (int i = 0; i < width; i++)
-    {
-      for (int j = 0; j < height; j++)
-      {
-        if (board[i][j] == true)
-        {
-          boardList[counter] = 1;
-        }
-        counter++;
-      }
-    }
-    return boardList;
-  }
   
   private int[] twoToOne(boolean[][] board, boolean horizontallyFlipped, 
           boolean verticallyFlipped)
   {
     int counter = 0;
-    int[] boardList = new int[64];
+    int[] boardList = new int[width*height];
     
     int hStart = 0;
     int hEnd = width;

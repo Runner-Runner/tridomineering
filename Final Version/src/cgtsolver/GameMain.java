@@ -1,13 +1,11 @@
 package cgtsolver;
 
-import java.util.List;
-
 public class GameMain
 {
   public static void main(String args[])
   {
     AbSolver abSolver = new AbSolver();
-    GameState gameState = new GameState(7,7);
+    GameState gameState = new GameState(8,8);
     abSolver.search(gameState);
     
 //    GameState gameState = new GameState(5, 5);
